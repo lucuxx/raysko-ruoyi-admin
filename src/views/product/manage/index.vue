@@ -281,8 +281,9 @@ export default {
 
     /** 新增按钮操作 */
     handleAdd() {
-      this.drawer = true;
-      this.mode = "ADD";
+      // this.drawer = true;
+      // this.mode = "ADD";
+      this.$router.push('/product/add')
     },
 
     /** 导出按钮操作 */
