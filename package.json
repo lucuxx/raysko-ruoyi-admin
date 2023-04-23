@@ -1,7 +1,7 @@
 {
-  "name": "TS-admin",
+  "name": "raysko-ruoyi-admin",
   "version": "1.0.0",
-  "description": "TS管理系统",
+  "description": "raysko-ruoyi-admin",
   "author": "Sky-team",
   "license": "MIT",
   "scripts": {
@@ -39,6 +39,8 @@
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^1.0.2",
     "D": "^1.0.0",
     "axios": "0.24.0",
     "clipboard": "2.0.8",

@@ -104,8 +104,10 @@ export default {
       title: title,
       codeUrl: "",
       loginForm: {
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
+        // username: "admin",
+        // password: "admin123",
         rememberMe: false,
         code: "",
         uuid: "",

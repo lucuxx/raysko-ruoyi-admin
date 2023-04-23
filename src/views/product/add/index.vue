@@ -31,23 +31,20 @@
           </el-col>
         </el-row>
 
-        <!-- <el-row>
+        <el-row>
           <el-col :span="12">
             <el-form-item label="状态" prop="status">
-              <el-select
-                v-model="productForm.status"
-                placeholder="请选择文章状态"
-              >
-                <el-option
-                  v-for="(item, index) in statusList"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
+              <el-radio-group v-model="productForm.status">
+                <el-radio
+                  :label="item.value"
+                  :key="item.value"
+                  v-for="item in statusList"
+                  >{{ item.label }}</el-radio
+                >
+              </el-radio-group>
             </el-form-item>
           </el-col>
-        </el-row> -->
+        </el-row>
 
         <el-row>
           <el-col :span="12">
@@ -67,7 +64,7 @@
           </el-col>
         </el-row>
 
-        <el-row>
+        <!-- <el-row>
           <el-col :span="12">
             <el-form-item label="排序" prop="orderId">
               <el-input
@@ -77,7 +74,7 @@
               />
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
 
         <el-row>
           <el-col :span="12">
@@ -90,30 +87,34 @@
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
               >
-                <img v-if="productForm.coverImg" :src="productForm.coverImg" class="avatar" />
+                <img
+                  v-if="productForm.coverImg"
+                  :src="productForm.coverImg"
+                  class="avatar"
+                />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
           </el-col>
         </el-row>
 
-        <!-- <el-row>
+        <el-row>
           <el-col :span="24">
-            <el-form-item label="轮播图片" prop="bannerList">
+            <el-form-item label="详情图片" prop="bannerList">
               <el-upload
                 class="avatar-uploader"
                 action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
                 list-type="picture-card"
                 :show-file-list="false"
-                :on-preview="handlePictureCardPreview"
-                :on-remove="handleRemove"
               >
+                <!-- :on-preview="handlePictureCardPreview"
+                :on-remove="handleRemove" -->
                 <img v-if="imageUrl" :src="imageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
           </el-col>
-        </el-row> -->
+        </el-row>
 
         <!-- <el-row>
           <el-col
@@ -131,7 +132,7 @@
         <el-row> 产品参数 </el-row>
         <br />
 
-        <el-row v-for="(item, index) in productForm.specs" :key="item + index">
+        <!-- <el-row v-for="(item, index) in productForm.specs" :key="item + index">
           <el-col :span="11">
             <el-form-item
               label="属性"
@@ -170,25 +171,49 @@
               >删除
             </el-button>
           </el-col>
-        </el-row>
+        </el-row> -->
 
-        <el-row>
+        <!-- <el-row>
           <el-col :span="12">
             <el-form-item>
               <el-button @click="handleAddSpecs"> 添加一行 </el-button>
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
 
         <br />
+        <!-- 富文本框 -->
+        <div style="border: 1px solid #ccc">
+          <Toolbar
+            ref="tool"
+            style="border-bottom: 1px solid #ccc"
+            :editor="editor"
+            :defaultConfig="toolbarConfig"
+            :mode="mode"
+          />
+          <Editor
+            style="height: 500px; overflow-y: hidden"
+            v-model="html"
+            :defaultConfig="editorConfig"
+            :mode="mode"
+            @onCreated="onCreated"
+          />
+        </div>
 
-        <el-row>
-          <el-col :span="24">
-            <el-form-item>
-              <el-button type="primary" @click="submit"> 提交 </el-button>
+        <br />
+         <el-row>
+          <el-col :span="12">
+            <el-form-item label="文档上传" prop="orderId">
+             <el-button type="primary">
+              产品文档上传
+             </el-button>
             </el-form-item>
           </el-col>
         </el-row>
+
+        <br />
+        <el-button > 保存 </el-button>
+        <el-button type="primary" @click="submit"> 提交 </el-button>
       </el-form>
     </div>
   </div>
@@ -197,11 +222,20 @@
 <script>
 import { addProduct, updateProduct } from "@/api/product/manage";
 import { listCategoryOptions } from "@/api/product/category";
+import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
+import { DomEditor } from "@wangeditor/editor";
 
+const statusList = [
+  { value: 0, label: "启用" },
+  { value: 1, label: "禁用" },
+];
 export default {
   name: "AddProduct",
+  components: { Editor, Toolbar },
+
   data() {
     return {
+      statusList,
       productForm: {
         name: "",
         desc: "",
@@ -234,11 +268,36 @@ export default {
         status: [{ required: true, message: "请选择状态", trigger: "change" }],
       },
       imageUrl: "",
-      categoryOptions:[]
+      categoryOptions: [],
+      // 富文本
+      editor: null,
+      html: "",
+      toolbarConfig: {
+        excludeKeys: [
+          "blockquote",
+          "insertLink",
+          "group-image",
+          "insertVideo",
+          "italic",
+          "fullScreen",
+          "codeBlock",
+          "todo",
+          "group-more-style", // 排除菜单组，写菜单组 key 的值即可
+        ],
+      },
+      editorConfig: { placeholder: "请输入内容..." },
+      mode: "simple", // or 'simple'
     };
   },
-  created(){
-    this.getCategory()
+  created() {
+    this.getCategory();
+  },
+  mounted() {
+    setTimeout(() => {
+      const toolbar = DomEditor.getToolbar(this.editor);
+      const curToolbarConfig = toolbar.getConfig();
+      console.log(curToolbarConfig.toolbarKeys);
+    }, 1000);
   },
   methods: {
     async getCategory() {
@@ -256,15 +315,15 @@ export default {
     },
 
     handleAvatarSuccess(response, uploadFile) {
-    //    = URL.createObjectURL(uploadFile.raw);
+      //    = URL.createObjectURL(uploadFile.raw);
       this.productForm.coverImg = res.data[0].url;
     },
     beforeAvatarUpload(rawFile) {
       if (rawFile.type !== "image/jpeg") {
-        this.$message.error('Avatar picture must be JPG format!')
+        this.$message.error("Avatar picture must be JPG format!");
         return false;
       } else if (rawFile.size / 1024 / 1024 > 2) {
-        this.$message.error("Avatar picture size can not exceed 2MB!")
+        this.$message.error("Avatar picture size can not exceed 2MB!");
         return false;
       }
       return true;
@@ -275,12 +334,20 @@ export default {
     handleDelSpecs(index) {
       this.productForm.specs.splice(index, 1);
     },
-    submit(){
-
-    }
+    submit() {},
+    onCreated(editor) {
+      this.editor = Object.seal(editor); // 一定要用 Object.seal() ，否则会报错
+    },
+  },
+  beforeDestroy() {
+    const editor = this.editor;
+    if (editor == null) return;
+    editor.destroy(); // 组件销毁时，及时销毁编辑器
   },
 };
 </script>
+
+<style src="@wangeditor/editor/dist/css/style.css"></style>
 
 <style lang="scss" scoped>
 .article_add {
